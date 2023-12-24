@@ -27,7 +27,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/api/webhooks/stripe/route.js"
+    "src/app/api/webhooks/stripe/route.ts"
   ],
   "exclude": ["node_modules"]
 }
