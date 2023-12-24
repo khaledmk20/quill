@@ -1,30 +1,36 @@
 "use client";
-import { Ghost, Loader2, MessageSquare, Plus, TrashIcon } from "lucide-react";
-import { trpc } from "../_trpc/client";
+
+import { trpc } from "@/app/_trpc/client";
 import UploadButton from "./UploadButton";
+import { Ghost, Loader2, MessageSquare, Plus, Trash } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import Link from "next/link";
 import { format } from "date-fns";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
-function Dashboard() {
+import { getUserSubscriptionPlan } from "@/lib/stripe";
+import { Button } from "@/components/ui/button";
+
+interface PageProps {
+  subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>;
+}
+
+const Dashboard = ({ subscriptionPlan }: PageProps) => {
   const [currentlyDeletingFile, setCurrentlyDeletingFile] = useState<
     string | null
   >(null);
-  const utils = trpc.useUtils();
+
+  const utils = trpc.useContext();
 
   const { data: files, isLoading } = trpc.getUserFiles.useQuery();
 
   const { mutate: deleteFile } = trpc.deleteFile.useMutation({
     onSuccess: () => {
-      // refetch user files
       utils.getUserFiles.invalidate();
     },
-    onMutate: ({ id }) => {
+    onMutate({ id }) {
       setCurrentlyDeletingFile(id);
     },
-
-    onSettled: () => {
+    onSettled() {
       setCurrentlyDeletingFile(null);
     },
   });
@@ -32,13 +38,13 @@ function Dashboard() {
   return (
     <main className="mx-auto max-w-7xl md:p-10">
       <div className="mt-8 flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:gap-0">
-        <h1 className="mb-3 font-bold text-5xl text-gray-900">My files</h1>
-        <UploadButton />
+        <h1 className="mb-3 font-bold text-5xl text-gray-900">My Files</h1>
+
+        <UploadButton isSubscribed={subscriptionPlan.isSubscribed} />
       </div>
 
-      {/* display all user files*/}
-
-      {files && files.length > 0 ? (
+      {/* display all user files */}
+      {files && files?.length !== 0 ? (
         <ul className="mt-8 grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-3">
           {files
             .sort(
@@ -75,19 +81,19 @@ function Dashboard() {
 
                   <div className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
-                    Mocked
+                    mocked
                   </div>
 
                   <Button
                     onClick={() => deleteFile({ id: file.id })}
-                    size={"sm"}
+                    size="sm"
                     className="w-full"
-                    variant={"destructive"}
+                    variant="destructive"
                   >
                     {currentlyDeletingFile === file.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <TrashIcon className="h-4 w-4" />
+                      <Trash className="h-4 w-4" />
                     )}
                   </Button>
                 </div>
@@ -100,11 +106,11 @@ function Dashboard() {
         <div className="mt-16 flex flex-col items-center gap-2">
           <Ghost className="h-8 w-8 text-zinc-800" />
           <h3 className="font-semibold text-xl">Pretty empty around here</h3>
-          <p>Let&apos;s upload your first pdf</p>
+          <p>Let&apos;s upload your first PDF.</p>
         </div>
       )}
     </main>
   );
-}
+};
 
 export default Dashboard;

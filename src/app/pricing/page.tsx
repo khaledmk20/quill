@@ -190,7 +190,7 @@ async function Page() {
                       <UpgradeButton></UpgradeButton>
                     ) : (
                       <Link
-                        href={"/sign-in"}
+                        href={"/sign-up"}
                         className={buttonVariants({
                           className: "w-full",
                         })}

@@ -13,13 +13,15 @@ import DropZone from "react-dropzone";
 import { trpc } from "../_trpc/client";
 import { useRouter } from "next/navigation";
 
-const UploadDropZone = () => {
+const UploadDropZone = ({ isSubscribed }: { isSubscribed: boolean }) => {
   const router = useRouter();
 
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const { toast } = useToast();
-  const { startUpload } = useUploadThing("pdfUploader");
+  const { startUpload } = useUploadThing(
+    isSubscribed ? "proPlanUploader" : "freePlanUploader"
+  );
 
   const { mutate: startPolling } = trpc.getFile.useMutation({
     onSuccess: (file) => {
@@ -96,7 +98,10 @@ const UploadDropZone = () => {
                   <span className="text-semibold">Click to upload</span> or drag
                   and drop
                 </p>
-                <p className="text-xs text-zinc-500"> pdf (up to 4MB)</p>
+                <p className="text-xs text-zinc-500">
+                  {" "}
+                  pdf (up to {isSubscribed ? "16" : "4"}MB)
+                </p>
               </div>
               {acceptedFiles && acceptedFiles[0] ? (
                 <div className="max-w-xs bg-white flex items-center rounded-md overflow-hidden outline-[1px] outline-zinc-200 divide-x divide-zinc-200">
@@ -131,6 +136,7 @@ const UploadDropZone = () => {
                 type="file"
                 id="dropzone-file"
                 className="hidden"
+                disabled
               />
             </label>
           </div>
@@ -140,7 +146,7 @@ const UploadDropZone = () => {
   );
 };
 
-function UploadButton() {
+function UploadButton({ isSubscribed }: { isSubscribed: boolean }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
     <Dialog
@@ -155,7 +161,7 @@ function UploadButton() {
         <Button>Upload pdf</Button>
       </DialogTrigger>
       <DialogContent>
-        <UploadDropZone />
+        <UploadDropZone isSubscribed={isSubscribed} />
       </DialogContent>
     </Dialog>
   );
