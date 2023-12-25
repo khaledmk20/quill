@@ -20,4 +20,5 @@ Quill is a web application designed to enhance your PDF reading experience by pr
 
 - Ensure you have the latest version of a modern web browser installed (Chrome, Firefox, Safari).
 
+[check it out](https://quill-chat.vercel.app)
 
