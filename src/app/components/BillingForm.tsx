@@ -1,9 +1,11 @@
 "use client";
 
-import { useToast } from "@/components/ui/use-toast";
 import { getUserSubscriptionPlan } from "@/lib/stripe";
-import { trpc } from "../_trpc/client";
+import { trpc } from "@/app/_trpc/client";
 import MaxWidthWrapper from "./MaxWidthWrapper";
+import { Loader2 } from "lucide-react";
+import { format } from "date-fns";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Card,
   CardDescription,
@@ -12,26 +14,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { format } from "date-fns";
 
 interface BillingFormProps {
   subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>;
 }
-function BillingForm({ subscriptionPlan }: BillingFormProps) {
+
+const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
   const { toast } = useToast();
 
   const { mutate: createStripeSession, isLoading } =
     trpc.createStripeSession.useMutation({
       onSuccess: ({ url }) => {
         if (url) window.location.href = url;
-
-        if (!url)
+        if (!url) {
           toast({
-            title: "Something went wrong.",
-            description: "Please try again in a moment.",
+            title: "There was a problem...",
+            description: "Please try again in a moment",
             variant: "destructive",
           });
+        }
       },
     });
 
@@ -46,10 +47,10 @@ function BillingForm({ subscriptionPlan }: BillingFormProps) {
       >
         <Card>
           <CardHeader>
-            <CardTitle>Supscription plan</CardTitle>
+            <CardTitle>Subscription Plan</CardTitle>
             <CardDescription>
-              You are currently on the <strong>{subscriptionPlan?.name}</strong>{" "}
-              plan
+              You are currently on the <strong>{subscriptionPlan.name}</strong>{" "}
+              plan.
             </CardDescription>
           </CardHeader>
 
@@ -59,7 +60,7 @@ function BillingForm({ subscriptionPlan }: BillingFormProps) {
                 <Loader2 className="mr-4 h-4 w-4 animate-spin" />
               ) : null}
               {subscriptionPlan.isSubscribed
-                ? "Manage subscription"
+                ? "Manage Subscription"
                 : "Upgrade to PRO"}
             </Button>
 
@@ -77,6 +78,6 @@ function BillingForm({ subscriptionPlan }: BillingFormProps) {
       </form>
     </MaxWidthWrapper>
   );
-}
+};
 
 export default BillingForm;
