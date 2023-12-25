@@ -3,14 +3,9 @@ import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import type Stripe from "stripe";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 export async function POST(request: Request) {
   const body = await request.text();
-  const signature = headers().get("Stripe-Signature") ?? "";
+  const signature = headers().get("stripe-Signature") ?? ""; //check
 
   let event: Stripe.Event;
 
