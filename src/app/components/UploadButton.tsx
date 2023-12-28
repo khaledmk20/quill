@@ -50,6 +50,7 @@ const UploadDropZone = ({ isSubscribed }: { isSubscribed: boolean }) => {
 
   return (
     <DropZone
+      noClick={true}
       multiple={false}
       onDrop={async (acceptedFile) => {
         setIsUploading(true);
@@ -136,7 +137,6 @@ const UploadDropZone = ({ isSubscribed }: { isSubscribed: boolean }) => {
                 type="file"
                 id="dropzone-file"
                 className="hidden"
-                disabled
               />
             </label>
           </div>
